@@ -19,7 +19,9 @@ codex plugin marketplace add sshanzel/plugins
 # update later with:  codex plugin marketplace upgrade
 ```
 
-`pr-master`'s commands ship to Codex as skills — `pr-master-create`, `pr-master-respond`, `pr-master-postmortem`, `pr-master-fix-ci`, `pr-master-fix-conflicts` (+ `test-writing`). They carry conservative trigger descriptions so the code-changing ones don't auto-fire; invoke them explicitly via `/skills` or `$`. (`plex` for Codex is on the way.)
+`pr-master`'s commands ship to Codex as skills — `pr-master-create`, `pr-master-respond`, `pr-master-postmortem`, `pr-master-fix-ci`, `pr-master-fix-conflicts` (+ `test-writing`). They carry conservative trigger descriptions so the code-changing ones don't auto-fire; invoke them explicitly via `/skills` or `$`.
+
+`plex` ships its own Codex plugin from its repo (a `plex-review` skill + `plex-parallel-review`): `codex plugin marketplace add sshanzel/plex`.
 
 ## Plugins
 
