@@ -1,0 +1,12 @@
+{
+  "name": "pr-master",
+  "description": "The PR lifecycle suite for any coding agent: draft PRs (creator), work review feedback end-to-end with a human gate (responder), turn merged-PR review patterns into durable guardrails (post-mortem), and on-demand fixers for failing CI and merge conflicts. Agent-agnostic; closes Plex's review loop automatically when a Plex MCP is present.",
+  "author": {
+    "name": "Lee Solevilla",
+    "email": "sshanzel@yahoo.com"
+  },
+  "homepage": "https://github.com/sshanzel/plugins",
+  "repository": "https://github.com/sshanzel/plugins",
+  "license": "MIT",
+  "keywords": ["pull-request", "code-review", "ci", "merge-conflict", "github", "git", "developer-tools"]
+}

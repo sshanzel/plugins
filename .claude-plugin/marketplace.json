@@ -1,0 +1,23 @@
+{
+  "name": "sshanzel",
+  "owner": {
+    "name": "Lee Solevilla",
+    "email": "sshanzel@yahoo.com"
+  },
+  "metadata": {
+    "description": "Lee Solevilla's coding-agent plugins.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "pr-master",
+      "source": "./plugins/pr-master",
+      "description": "The PR lifecycle suite for any coding agent: draft PRs, work through review feedback end-to-end (human-gated), and post-mortem merged PRs into durable guardrails. Plex-aware — closes the review learning loop when a Plex MCP is present."
+    },
+    {
+      "name": "plex",
+      "source": { "source": "git-subdir", "url": "sshanzel/plex", "path": "plugin" },
+      "description": "Local-first, unbiased AI code reviewer — a fresh-context reviewer grounded in a blast-radius code graph + accumulated review knowledge, plus a parallel-review orchestrator and the MCP engine (via npx)."
+    }
+  ]
+}
