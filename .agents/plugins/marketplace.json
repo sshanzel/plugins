@@ -1,0 +1,18 @@
+{
+  "name": "sshanzel",
+  "owner": {
+    "name": "Lee Solevilla",
+    "email": "sshanzel@yahoo.com"
+  },
+  "metadata": {
+    "description": "Lee Solevilla's coding-agent plugins (Codex).",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "pr-master",
+      "source": { "path": "./plugins/pr-master" },
+      "description": "The PR lifecycle suite for any coding agent: draft PRs, work through review feedback end-to-end (human-gated), and post-mortem merged PRs into durable guardrails, plus fixers for failing CI and merge conflicts. Plex-aware — closes the review learning loop when a Plex MCP is present."
+    }
+  ]
+}

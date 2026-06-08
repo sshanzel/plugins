@@ -1,0 +1,15 @@
+{
+  "name": "sshanzel-plugins",
+  "version": "0.1.0",
+  "description": "Source + installer for Lee Solevilla's coding-agent plugins (Claude Code + Codex). Install skills into .agents/skills with: npx github:sshanzel/plugins install",
+  "type": "module",
+  "bin": {
+    "sshanzel-plugins": "./install.mjs"
+  },
+  "scripts": {
+    "gen:codex": "node plugins/pr-master/scripts/gen-codex-skills.mjs"
+  },
+  "license": "MIT",
+  "author": "Lee Solevilla <sshanzel@yahoo.com>",
+  "repository": "https://github.com/sshanzel/plugins"
+}
