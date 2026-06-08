@@ -1,6 +1,6 @@
 # sshanzel/plugins
 
-Coding-agent plugins for **[Claude Code](https://code.claude.com)** and **[Codex](https://developers.openai.com/codex)** — and any agent that reads the [`AGENTS.md`](https://agents.md) / `.agents/skills` convention. One repo, one source of truth, three ways to install.
+Coding-agent plugins for **[Claude Code](https://code.claude.com)** and **[Codex](https://developers.openai.com/codex)** — one repo, one source of truth, each agent installs from its own marketplace.
 
 ## Claude Code
 
@@ -20,16 +20,6 @@ codex plugin marketplace add sshanzel/plugins
 ```
 
 `pr-master`'s commands ship to Codex as skills — `pr-master-create`, `pr-master-respond`, `pr-master-postmortem`, `pr-master-fix-ci`, `pr-master-fix-conflicts` (+ `test-writing`). They carry conservative trigger descriptions so the code-changing ones don't auto-fire; invoke them explicitly via `/skills` or `$`. (`plex` for Codex is on the way.)
-
-## Any agent — vendor into `.agents/skills`
-
-For Codex (or anything that reads `.agents/skills`) without the marketplace, drop the skills straight into a folder:
-
-```
-npx github:sshanzel/plugins install            # ./.agents/skills  (this project — commit to share)
-npx github:sshanzel/plugins install --global   # ~/.agents/skills   (all your projects)
-npx github:sshanzel/plugins install --dry-run  # preview
-```
 
 ## Plugins
 
@@ -59,14 +49,14 @@ Then `/plex:review` in any repo.
 The pr-master **commands** (`plugins/pr-master/commands/*.md`) are canonical. Codex has no "commands" type, so its skills are **generated** from them:
 
 ```
-npm run gen:codex   # commands/*.md  →  plugins/pr-master/codex/skills/pr-master-*/SKILL.md
+node plugins/pr-master/scripts/gen-codex-skills.mjs   # commands/*.md → plugins/pr-master/codex/skills/pr-master-*/SKILL.md
 ```
 
-Edit a command, re-run the generator, commit. The Claude plugin reads `commands/` + `skills/`; the Codex plugin (`.codex-plugin/plugin.json`) reads `codex/skills/`; the `npx` installer vendors that same `codex/skills/` set. The two manifests (`.claude-plugin/` + `.codex-plugin/`) live side by side in one plugin dir — each agent ignores the other's.
+Edit a command, re-run the generator, commit. The Claude plugin reads `commands/` + `skills/`; the Codex plugin (`.codex-plugin/plugin.json`) reads `codex/skills/`. The two manifests (`.claude-plugin/` + `.codex-plugin/`) live side by side in one plugin dir — each agent ignores the other's.
 
 ## Updates
 
-Plugins are git-SHA versioned (no pinned version), so a `git push` here is an update. Claude: `/plugin marketplace update sshanzel` (or auto-update) + `/reload-plugins`. Codex: `codex plugin marketplace upgrade`. The `.agents/skills` installer: re-run `npx`.
+Plugins are git-SHA versioned (no pinned version), so a `git push` here is an update. Claude: `/plugin marketplace update sshanzel` (or auto-update) + `/reload-plugins`. Codex: `codex plugin marketplace upgrade`.
 
 ## License
 
