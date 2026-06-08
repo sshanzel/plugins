@@ -1,10 +1,10 @@
 ---
-description: Use after a PR merges (or against any finished PR) to pull every review comment, cluster the themes, and convert recurring patterns into durable AGENTS.md guardrails so the next PR avoids the same review tax. Complements pr-review-documenter (which judges one comment at a time during review); this skill judges the whole PR after the fact, where cluster patterns finally become visible.
+description: Use after a PR merges (or against any finished PR) to pull every review comment, cluster the themes, and convert recurring patterns into durable AGENTS.md guardrails so the next PR avoids the same review tax. It judges the whole PR after the fact, where cluster patterns finally become visible — a single comment rarely justifies a rule, but six of them do.
 ---
 
 # PR Post-Mortem Skill
 
-Use this skill to extract durable engineering lessons from a finished PR's review history. Per-comment judgment in real time (`pr-review-documenter`) misses cluster patterns — "this primitive got six 4-pt-grid comments" only becomes a rule when you see them together.
+Use this skill to extract durable engineering lessons from a finished PR's review history. Judging comments one at a time, as they land, misses cluster patterns — "this primitive got six 4-pt-grid comments" only becomes a rule when you see them together.
 
 ## When To Use
 
@@ -185,6 +185,5 @@ A finished post-mortem should:
 
 ## Related Skills
 
-- `pr-review-documenter` — same goal but during the review cycle, one comment at a time. Use both. The post-mortem catches what per-comment review missed.
 - `document-module` — when a module needs a fuller AGENTS.md before module-specific rules can land.
-- `pr-review-responder` — fix-and-reply during review. Post-mortem runs after that finishes.
+- `/pr-master:respond` — fix-and-reply during review. Post-mortem runs after that finishes.

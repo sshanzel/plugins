@@ -21,7 +21,7 @@ Work through a PR's review feedback end-to-end. Use `$ARGUMENTS` as the PR (numb
    - `stale`
    - `question`
    - `discuss`
-   While classifying, if a `pr-review-documenter` skill is available, use it for comments that express a reusable pattern, guardrail, or module invariant. If documentation should change, include that docs update in the proposed action.
+   While classifying, watch for comments that express a reusable pattern, guardrail, or module invariant — when one should change documentation (specs, runbooks, `AGENTS.md`), include that docs update in the proposed action.
    - When a comment creates a new `AGENTS.md` rule or points at an existing
      guardrail, do a same-pattern sweep before proposing or applying fixes.
      Search the touched module/package for equivalent code shapes, include all
