@@ -4,7 +4,7 @@ description: Use after a PR merges (or against any finished PR) to pull every re
 
 # PR Post-Mortem Skill
 
-Use this skill to extract durable engineering lessons from a finished PR's review history. Judging comments one at a time, as they land, misses cluster patterns — "this primitive got six 4-pt-grid comments" only becomes a rule when you see them together.
+Use this skill to extract durable engineering lessons from a finished PR's review history. Judging comments one at a time, as they land, misses cluster patterns — "the same low-level nit got flagged on six different files" only becomes a rule when you see them together.
 
 ## When To Use
 
@@ -21,7 +21,7 @@ Do **not** run this for:
 ## Inputs
 
 - PR number (required). Repo is derived from `git remote get-url origin` unless the user gives it.
-- Optional: a focus area ("auth", "host UI", "money math") to scope the analysis.
+- Optional: a focus area ("auth", "billing", "a specific module") to scope the analysis.
 
 ## Workflow
 
@@ -45,21 +45,21 @@ What each gives you:
 
 ### 2. Cluster by theme
 
-Group every comment by the underlying concern, **not** by file. The same theme can hit multiple files (six 4-pt-grid violations across `Input`, `Select`, `Tabs` is one cluster, not three).
+Group every comment by the underlying concern, **not** by file. The same theme can hit multiple files (the same rule violated across several components is one cluster, not three).
 
 Common cluster axes:
 
-- **Shared-helper duplication** — re-implementing what `@playright/shared` / `@playright/api-client` / `@playright/ui-tokens` already exposes.
-- **Boundary normalization gaps** — `''`, whitespace-only, `Number('')`, `<input type="date">` clears, query-param `''`, env trailing slashes.
-- **Authorization wiring** — guard stacking, guard ordering, guard-resolved state re-queried in handlers, role checks bypassed by transport-specific paths.
-- **Schema / DTO consistency** — read-vs-write invariant drift, two write paths for the same field, related schemas with diverging constraints.
+- **Shared-helper duplication** — re-implementing what a shared package, utility, or design-token module already exposes.
+- **Boundary normalization gaps** — empty string, whitespace-only, `Number('')` → `0`, cleared inputs, empty query params, trailing slashes; the same edge handled inconsistently across call sites.
+- **Authorization wiring** — auth-check ordering/stacking, re-querying already-resolved auth state inside handlers, role checks bypassed on an alternate transport or path.
+- **Schema / contract consistency** — read-vs-write invariant drift, two write paths for the same field, related schemas with diverging constraints.
 - **Lifecycle / state machine** — terminal-state downgrades, illegal transitions, idempotency gaps.
-- **Atomic write races** — read-then-insert, pre-flight-without-mutation predicate, missing pessimistic locks.
-- **UI primitive correctness** — half-step spacing, nested HTML elements, invalid attributes on `asChild` targets, ARIA derived from a different source than visual state.
-- **React staleness** — imperative listeners that mutate DOM without updating state, missing cleanup, stale closure dependencies.
-- **Doc / config drift** — `_headers` referencing missing files, runbook step paths that don't match the code, AGENTS.md self-contradiction.
+- **Atomic write races** — read-then-insert, a pre-flight check without the mutation, missing locks.
+- **UI primitive correctness** — invalid nesting or attributes, accessibility state derived from a different source than the visual state, spacing off the design scale.
+- **UI-framework staleness** — imperative DOM/state mutation without a re-render, missing effect cleanup, stale closures/dependencies.
+- **Doc / config drift** — config referencing missing files, runbook steps that don't match the code, `AGENTS.md` self-contradiction.
 - **Test naming / coverage** — tests whose name describes a different code path than the fixture exercises.
-- **Migration safety** — destructive `up()` without paired `down()`, constraint relaxation without backfill.
+- **Migration safety** — a destructive migration with no reverse path, constraint relaxation without a backfill.
 
 If a comment doesn't fit a known cluster, name a new one. Don't force-fit.
 
@@ -69,7 +69,7 @@ Strong signal (write a guardrail):
 
 - **≥3 comments in one cluster, same PR** — the rule is missing or not enforced.
 - **Repeat from an earlier PR** — cross-reference the most recent root `AGENTS.md` to see if the rule already exists. If yes, the rule isn't *trigger-able* — add a grep-step / pre-commit check that would have caught it.
-- **Cross-app pattern** — one root cause showed up in two or more apps (host + web both had the same listener-stale bug).
+- **Cross-module pattern** — one root cause showed up in two or more modules or apps.
 - **Security / money / lifecycle / auth** — even one comment is worth documenting; these are non-recoverable categories.
 
 Weak signal (don't document):
@@ -83,30 +83,27 @@ Weak signal (don't document):
 Use this decision tree:
 
 ```
-Is the rule reach-multiple-apps-or-modules?
-├── Yes → root AGENTS.md "Required Pre-Review Checks"
-└── No  → one module owns it
-         ├── Module has AGENTS.md → add to its "Things that are easy to get wrong"
-         │                          or "Hard Rules" section
-         └── Module has no AGENTS.md → create one (use the document-module skill
-                                       if the module needs full coverage; otherwise
-                                       stub the file with the new bullet)
+Is the rule cross-cutting (reaches multiple modules/apps)?
+├── Yes → the root AGENTS.md ("Required Pre-Review Checks" or the equivalent section)
+└── No  → the AGENTS.md of the one module that owns it
+         ├── Module has an AGENTS.md → add to its "easy to get wrong" / "hard rules" section
+         └── Module has no AGENTS.md → create one (write a full module guide if it needs
+                                       full coverage; otherwise stub the file with the new bullet)
 ```
 
 Tactical guidance:
 
-- A rule that applies to *every* React app (web + host + mobile) is cross-cutting → root.
-- A rule that applies only to NestJS controllers (e.g., guard composition) → `apps/api/src/<module>/AGENTS.md`.
-- A rule about shadcn primitives is host-specific today but will apply to `apps/web` and future `apps/console` → either duplicate to both files, or keep at root with a short pointer. Prefer per-app if the *implementation* differs (web uses Tailwind, mobile uses StyleSheet).
-- A rule about shared contracts → `packages/shared/AGENTS.md`. A rule about the HTTP client → `packages/api-client/AGENTS.md`. A rule about design tokens → `packages/ui-tokens/AGENTS.md`.
-- Avoid putting one-app rules at root — the root section bloats and the per-app context (Tailwind utility names, Radix component, etc.) goes stale faster.
+- A rule that applies to *every* module or app of a kind is cross-cutting → root.
+- A rule specific to one layer or framework (e.g. one service's request handlers) → that module's `AGENTS.md`.
+- When the same concern spans variants whose *implementation* differs (e.g. one platform vs another), prefer per-module rules over one root rule that goes stale — or keep a short pointer at root.
+- Avoid putting one-module rules at root — the root section bloats and the per-module context goes stale faster.
 
 ### 5. Check for duplicates before writing
 
-For every proposed bullet, grep the candidate target file AND the root for the rule already existing in some form:
+For every proposed bullet, grep every `AGENTS.md` in the repo (root + modules) for the rule already existing in some form:
 
 ```bash
-rg -i "<key term 1>|<key term 2>" AGENTS.md apps/*/AGENTS.md apps/api/src/*/AGENTS.md packages/*/AGENTS.md
+rg -i "<key term 1>|<key term 2>" $(git ls-files '**/AGENTS.md' 'AGENTS.md')
 ```
 
 If the rule already exists and was still missed, the right action is usually one of:
@@ -127,9 +124,9 @@ Format every new rule as:
 
 Rules:
 
-- **Imperative, forward-looking.** "Boundary preprocessors collapse undefined / '' / whitespace via one helper." Not "PR #15 had a preprocessor bug."
-- **Concrete failure mode.** "`Number('')` returns `0`, not `NaN`, so blank price input silently creates a free unit." Not "validate numeric inputs."
-- **Show the trigger.** Either the shared helper name (`nullableTrimmed`, `preserveDateInputValue`), the grep command (`rg '\-[0-9]+\.5' src/components/ui`), or the framework API (`getFieldState(name, formState)`).
+- **Imperative, forward-looking.** "Normalize undefined / '' / whitespace through one boundary helper." Not "PR #15 had a preprocessor bug."
+- **Concrete failure mode.** "`Number('')` returns `0`, not `NaN`, so a blank price input silently creates a free unit." Not "validate numeric inputs."
+- **Show the trigger.** Either the shared helper's name, the grep command that finds offenders (`rg '<pattern>' <dir>`), or the framework API that enforces it.
 - **One PR reference.** Cite the source PR for traceability; don't enumerate every fix commit. Future readers want to know "this rule has history", not the full audit trail.
 - **No emoji.** No "TODO" / "FIXME" markers. Forward-looking instructions only.
 
@@ -160,16 +157,16 @@ Root:
 
 Modules:
 - auth: <bullet>
-- host: <bullets>
-- shared: <bullet>
+- billing: <bullets>
+- shared-types: <bullet>
 ```
 
 Include the PR # and bug commit refs where the trigger lives, but keep the message under ~25 lines.
 
 ## What To Skip
 
-- **Don't restate the PR description.** The PR body lives in GitHub; the retro lives in AGENTS.md. The two are different artifacts.
-- **Don't write a per-PR retro file** (`docs/retro/pr-15.md`). The output is updates to AGENTS.md files, not a new doc.
+- **Don't restate the PR description.** The PR body lives in GitHub; the retro lives in `AGENTS.md`. The two are different artifacts.
+- **Don't write a per-PR retro file** (`docs/retro/pr-15.md`). The output is updates to `AGENTS.md` files, not a new doc.
 - **Don't document rejected feedback.** A reviewer suggestion that the author declined is not a guardrail.
 - **Don't bloat the root.** If you're adding more than 2 bullets to root from one PR, audit — most of them probably belong in module files.
 - **Don't delete prior bullets while you're there.** Trim work is a separate task; mixing it with a retro makes the commit hard to review.
@@ -183,7 +180,6 @@ A finished post-mortem should:
 3. Include the grep / helper / framework API that makes the rule actionable.
 4. Leave the docs system more discoverable than it was — root pointer updated, module headings consistent.
 
-## Related Skills
+## Related
 
-- `document-module` — when a module needs a fuller AGENTS.md before module-specific rules can land.
 - `/pr-master:respond` — fix-and-reply during review. Post-mortem runs after that finishes.

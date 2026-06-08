@@ -1,8 +1,9 @@
 ---
-description: Draft, prepare, create, or update PR descriptions using the team's standard structure.
+description: Draft, prepare, create, or update a PR description in a clear, consistent structure.
+argument-hint: "[pr-number-or-url]"
 ---
 
-# PR Skill
+# Create / update a PR description
 
 Use this when the user wants to open a PR, draft a description, or clean up PR presentation.
 
@@ -14,65 +15,54 @@ Use this when the user wants to open a PR, draft a description, or clean up PR p
 
 ## PR template
 
+Start from this structure and **drop any section that doesn't apply** to the change:
+
 ```markdown
 ## What changed
 
-## Entity changes
+## Why
 
-| Entity | Field | Change | Before | After |
-| ------ | ----- | ------ | ------ | ----- |
-
-## Schema changes
-
-| Schema | Field | Change | Before | After |
-| ------ | ----- | ------ | ------ | ----- |
-
-## Endpoints
-
-| Method | Path | Status | Description |
-| ------ | ---- | ------ | ----------- |
+## API / schema changes
+<!-- routes, request/response shapes, DB or model changes — only if the PR touches them -->
 
 ## Breaking changes
+
+## How to test
 
 ## Linked issues
 
 ## Checklist
 
-- [ ] Lint passes locally
+- [ ] Lint / format passes locally
 - [ ] Tests added / updated
 - [ ] Docs updated (if needed)
-- [ ] Pre-review checklist considered
 ```
 
-## Pre-review checklist
+## Self-review before requesting review
 
-Before creating or re-requesting review on a non-trivial PR, scan the change for
-the review patterns that have caused repeated back-and-forth:
+Before opening (or re-requesting review on) a non-trivial PR, scan the diff for the kinds of issues
+that cause repeated review back-and-forth. These are prompts to check, not a section to paste into
+the PR body:
 
-- Shared contracts stay synchronized across `packages/shared`, API presenters,
-  frontend consumers, mocks/seeds, and docs.
-- Durable workflows name their lifecycle states and prevent stale or duplicate
-  actions from downgrading terminal state.
-- Retryable writes are idempotent, transactional where needed, and safe under
-  concurrent requests or unique-constraint races.
-- Auth, visibility, CORS/origin, webhook, media, and production-default
-  boundaries inherit the existing security policy unless the PR documents a
-  narrower exception.
-- List, table, notification, and media presenters batch related reads instead
-  of doing per-row lookups or unbounded parameter lists.
-- Frontend flows lock pending submissions, preserve drafts/selections until
-  success, show accurate errors, and clean up timers, listeners, object URLs,
-  sockets, and async callbacks.
-- Entity-driven schema changes use generated TypeORM migrations and are checked
-  against both fresh and existing database shapes when constraints or renames
-  are involved.
-- Reusable review lessons are captured in the root or module `AGENTS.md` before
-  the PR asks for another review pass.
+- **Contracts stay in sync** — when a shape changes in one place (shared types, the API response, a
+  client consumer, mocks/seeds, docs), it changes everywhere it's mirrored.
+- **State machines** — lifecycle states are named, transitions are validated, and a late or duplicate
+  action can't downgrade a terminal state.
+- **Retried / concurrent writes** are idempotent and safe under read-then-write or unique-constraint
+  races (transactional where it matters).
+- **Security defaults** — auth, visibility, CORS/origin, webhooks, uploads, and production toggles
+  inherit the existing policy unless the PR documents a narrower exception.
+- **Read efficiency** — list/table/notification paths batch related reads instead of per-row lookups
+  or unbounded `IN` lists.
+- **Client flows** — pending submissions lock, drafts/selections survive until success, errors are
+  accurate, and timers/listeners/object URLs/sockets/async callbacks are cleaned up.
+- **Schema / migration safety** — migrations are checked against both a fresh and an existing
+  database when constraints or renames are involved, and destructive steps are reversible.
+- **Capture the lesson** — a recurring review point is written into the relevant `AGENTS.md` before
+  asking for another pass (see `/pr-master:postmortem`).
 
 ## Notes
 
-- Organize changes by concern, not by file list.
+- Organize the description by concern, not by file list.
 - Keep "What changed" short and readable.
-- Drop template sections that are irrelevant to the PR.
-- Keep the PR body focused; the pre-review checklist is usually a preparation
-  step, not a section that must be pasted into every small PR.
+- The self-review list is a preparation step, not something pasted into every small PR.

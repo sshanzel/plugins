@@ -18,12 +18,10 @@ Use this when the user wants failing GitHub Actions checks diagnosed and repaire
 7. Commit the fixes.
 8. Only push if the user explicitly asked for it.
 
-## Typical checks for this repo
+## Discover the repo's checks — don't assume them
 
-- `pnpm --filter @salyn/api test`
-- `pnpm --filter @salyn/api typecheck`
-- `pnpm --filter @salyn/web test`
-- `pnpm --filter @salyn/web typecheck`
-- `pnpm --filter @salyn/shared test`
-- `pnpm --filter @salyn/shared typecheck`
-- `pnpm format:check`
+Don't hardcode the commands. Read the failing job's steps — from the workflow file under
+`.github/workflows/`, or from the logs you downloaded — and run the **same** commands locally
+(the test / typecheck / lint / format scripts the job invoked, e.g. from `package.json`,
+`Makefile`, or the workflow itself). Validate against those exact scripts before committing, so
+"green locally" means the same thing CI checks.

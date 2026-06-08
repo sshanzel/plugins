@@ -11,7 +11,7 @@ Work through a PR's review feedback end-to-end. Use `$ARGUMENTS` as the PR (numb
 
 1. Detect or receive the PR URL.
 2. Fetch inline comments, issue comments, and unresolved review threads via `gh`.
-   - Ignore automated deployment/status comments that do not require code review action, especially Vercel bot deployment/access comments. Do not number them, include them in the assessment table, reply to them, or include them in the final summary.
+   - Ignore automated deployment/status comments that do not require code review action — e.g. deployment/preview-status bots (Vercel, Netlify, and the like). Do not number them, include them in the assessment table, reply to them, or include them in the final summary.
    - Treat low-confidence or suppressed review notes as regular feedback only the first time they appear or when they materially change. If a previous responder run already assessed or addressed that low-confidence note, do not list it again in later assessment tables or summary comments.
    - Cluster duplicate automated-review comments by root cause before presenting to the user. Copilot can repeat the same concern across commits or line anchors; keep the GitHub comment/thread IDs in your notes so each thread still gets a reply/resolution later, but do not flood the assessment with one row per duplicate when the proposed fix is identical.
 3. Classify each item as:
@@ -58,7 +58,7 @@ Work through a PR's review feedback end-to-end. Use `$ARGUMENTS` as the PR (numb
 ## Rules
 
 - Do not accept review feedback blindly; verify it against the code and product direction.
-- Treat documentation as a future-reference contract. Specs, runbooks, `AGENTS.md`, and the PR description itself are read later as the source of truth, so an inaccurate reference (wrong/incomplete route — remember the Nest global `/api` prefix — wrong HTTP-status semantics, a stale design/ordering claim that no longer matches the shipped code, a missing ops step like an IAM grant or env var) is a real defect: classify it `bug`/`improvement`/`minor` and fix it, never dismiss it as noise. Apply the same accuracy bar to the PR body. Only down-classify a docs comment to a reply-without-change when the reviewer's wording is genuinely equivalent — it means the same thing — in which case say so and resolve.
+- Treat documentation as a future-reference contract. Specs, runbooks, `AGENTS.md`, and the PR description itself are read later as the source of truth, so an inaccurate reference (a wrong/incomplete route or a documented path prefix that doesn't match the framework's actual routing, wrong HTTP-status semantics, a stale design/ordering claim that no longer matches the shipped code, a missing ops step like an IAM grant or env var) is a real defect: classify it `bug`/`improvement`/`minor` and fix it, never dismiss it as noise. Apply the same accuracy bar to the PR body. Only down-classify a docs comment to a reply-without-change when the reviewer's wording is genuinely equivalent — it means the same thing — in which case say so and resolve.
 - Group duplicate automated-review feedback in the user-facing assessment and summary, but still reply to and resolve every underlying GitHub thread/comment after fixes land.
 - Proposed fixes should be complete, not incremental fragments.
 - Every item that pushes a code change ships a test when one is applicable — not just `bug` items, but also `improvement`/`minor` and any change of behavior, contract, boundary, or edge case. Add or extend the test in the same commit as the fix, and name it in both the thread reply and the summary row. **Defer to the `test-writing` skill (bundled with `pr-master`) for what a thorough test looks like** — don't hardcode a framework or repo-specific rule here. A test is genuinely *not* applicable only for docs-only edits, pure renames with no behavior change, config/comment tweaks, or changes already fully exercised by an existing test — in those cases state the reason in the reply/summary instead of silently shipping untested. When unsure whether a change is testable, default to writing the test.
@@ -304,8 +304,8 @@ Review feedback has been addressed and is ready for re-review.
 | 2. Discussion item | Replied with rationale and left open for product decision. |
 
 Checks passed:
-- `pnpm --filter @salyn/web test`
-- `pnpm format:check`
+- `npm test`
+- `npm run lint`
 
 Threads were replied to and resolved; re-review has been requested.
 EOF
