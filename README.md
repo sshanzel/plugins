@@ -37,6 +37,8 @@ The whole pull-request loop. Agent-agnostic; gets smarter when [Plex](https://gi
 | `/pr-master:fix-ci` | `pr-master-fix-ci` | Diagnose + fix a failing CI run from its GitHub Actions logs |
 | `/pr-master:fix-conflicts` | `pr-master-fix-conflicts` | Resolve merge conflicts by understanding both sides, validate, report |
 
+Full details: **[`plugins/pr-master/README.md`](plugins/pr-master/README.md)**.
+
 ### `plex` — local-first, unbiased AI code reviewer
 
 A fresh-context reviewer grounded in a blast-radius code graph + accumulated review knowledge, plus a parallel-review orchestrator. The MCP engine is auto-fetched from npm (`@sshanzel/plex`) via `npx`. Source + docs: **[sshanzel/plex](https://github.com/sshanzel/plex)**.
