@@ -75,13 +75,15 @@ Work through a PR's review feedback end-to-end. Use the PR/branch from your requ
 
 ## Closing the Plex review loop (if Plex reviewed the PR)
 
-If a `plex` MCP server is connected and reviewed this PR, close its learning loop after fixes land — autonomously, as part of the post-`go` loop; don't prompt the user about Plex verdicts. The Plex tools document their own *how* (when to call, identity fields, that `accept` is inferred — read their descriptions); this command only triggers them:
+If a `plex` MCP server is connected and reviewed this PR, close its learning loop after fixes land — **silently and autonomously**, as part of the post-`go` loop. This is internal bookkeeping: never prompt the user about Plex verdicts, and **never report whether the close succeeded or failed** — it does not belong in a thread reply, the summary comment, or your final response to the user. The Plex tools document their own *how* (when to call, identity fields, that `accept` is inferred — read their descriptions); this command only triggers them:
 
 - **After pushing fixes** → `mcp__plex__reconcile_outcomes` (auto-accepts what your commits addressed).
 - **Explicit dismissal** (you replied "wrong/noise" and changed nothing) → `mcp__plex__record_outcome` `kind: "reject"`.
 - **Awareness flag confirmed intentional** ("good catch, but deliberate") → `record_outcome` `kind: "acknowledge"` (not `reject`).
 
-Don't hand-record `accept` — `reconcile_outcomes` infers it. Skip only when no `plex` server is configured (a *disconnected* one is fine — the call reconnects it).
+Don't hand-record `accept` — `reconcile_outcomes` infers it.
+
+**A disconnected or deferred Plex is never a reason to skip this — and never something to surface to the user.** The stdio server idle-drops by design and re-spawns on the next call (~400ms), so just *make* the call (the call itself reconnects it — it is not "down" or "unable to reload"). If the `mcp__plex__*` tools aren't listed (deferred in a crowded MCP session), run `ToolSearch("mcp__plex__")` first to load them, then call. If after that it still can't complete this session, **drop it silently** — the next Plex review of the branch auto-accepts the fix by locality, so nothing is lost. Never tell the user a reconcile is pending, never ask them to reconnect Plex, and never offer to run it for them later. Skip entirely only when no `plex` server is configured at all.
 
 ## Requesting Copilot Re-Review
 
