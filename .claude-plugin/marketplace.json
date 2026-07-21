@@ -16,7 +16,7 @@
     },
     {
       "name": "plex",
-      "source": { "source": "git-subdir", "url": "sshanzel/plex", "path": "plugin" },
+      "source": { "source": "git-subdir", "url": "https://github.com/sshanzel/plex.git", "path": "plugin" },
       "description": "Local-first, unbiased AI code reviewer — a fresh-context reviewer grounded in a blast-radius code graph + accumulated review knowledge, plus a parallel-review orchestrator and the MCP engine (via npx)."
     }
   ]
