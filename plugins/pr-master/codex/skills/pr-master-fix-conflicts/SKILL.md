@@ -33,3 +33,4 @@ The ONLY exception is a **genuinely incompatible** hunk — where the two sides 
 - **Ask, don't guess** on any genuinely incompatible hunk — surface both sides and let the user decide.
 - If tests fail after resolving, the resolution is wrong — fix it, don't push.
 - `--force-with-lease`, never `--force`.
+- A resolved conflict is not license to add explanatory comments to the merged result. Load and follow the `comment-discipline` skill before resolving, and keep the same discipline as writing the code fresh.

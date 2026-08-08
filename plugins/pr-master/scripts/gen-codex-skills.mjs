@@ -3,8 +3,8 @@
 //
 // The pr-master *commands* (commands/*.md) are the single source of truth. Codex has no
 // "commands" type — its reusable unit is a skill (SKILL.md under .agents/skills). This script
-// emits one Codex skill per command into codex/skills/, plus a copy of the shared test-writing
-// skill, so the Codex plugin (.codex-plugin/plugin.json -> "skills": "./codex/skills/") and the
+// emits one Codex skill per command into codex/skills/, plus copies of the shared reference
+// skills, so the Codex plugin (.codex-plugin/plugin.json -> "skills": "./codex/skills/") and the
 // npx installer can ship them. Edit the command, then re-run: `node scripts/gen-codex-skills.mjs`.
 //
 // They live in their OWN dir (not the plugin's top-level skills/) on purpose: Claude Code
@@ -49,13 +49,11 @@ const SKILLS = {
   },
 };
 
-/** Strip leading YAML frontmatter, return the body. */
 function stripFrontmatter(src) {
   const m = src.match(/^---\n[\s\S]*?\n---\n?/);
   return m ? src.slice(m[0].length).replace(/^\n+/, '') : src;
 }
 
-/** Rewrite Claude-isms the command body carries into Codex-appropriate language. */
 function adaptBody(body) {
   return body
     // /pr-master:respond -> the `pr-master-respond` skill (Codex has no slash-namespaced commands).
@@ -75,7 +73,6 @@ function emit(name, description, body, sourceNote) {
   return name;
 }
 
-// fresh output
 rmSync(OUT, { recursive: true, force: true });
 
 const written = [];
@@ -84,14 +81,18 @@ for (const [file, meta] of Object.entries(SKILLS)) {
   written.push(emit(meta.name, meta.description, adaptBody(stripFrontmatter(src)), `commands/${file}`));
 }
 
-// Carry the shared test-writing skill into the Codex set verbatim (pr-master-respond references it).
-const tw = readFileSync(join(ROOT, 'skills', 'test-writing', 'SKILL.md'), 'utf8');
-mkdirSync(join(OUT, 'test-writing'), { recursive: true });
-writeFileSync(
-  join(OUT, 'test-writing', 'SKILL.md'),
-  tw.replace(/(\n---\n)/, `$1\n<!-- COPIED from skills/test-writing by scripts/gen-codex-skills.mjs — edit the source and re-run. -->\n`),
-);
-written.push('test-writing');
+// Shared reference skills the commands above defer to by name (e.g. respond.md loads both) —
+// Codex needs its own copy of each since it has no cross-plugin skill lookup.
+const SHARED_SKILLS = ['test-writing', 'comment-discipline'];
+for (const name of SHARED_SKILLS) {
+  const src = readFileSync(join(ROOT, 'skills', name, 'SKILL.md'), 'utf8');
+  mkdirSync(join(OUT, name), { recursive: true });
+  writeFileSync(
+    join(OUT, name, 'SKILL.md'),
+    src.replace(/(\n---\n)/, `$1\n<!-- COPIED from skills/${name} by scripts/gen-codex-skills.mjs — edit the source and re-run. -->\n`),
+  );
+  written.push(name);
+}
 
 console.log(`Generated ${written.length} Codex skills in codex/skills/:`);
 for (const n of written) console.log(`  - ${n}`);

@@ -42,9 +42,14 @@ If a [Plex](https://github.com/sshanzel/plex) MCP server is connected and review
 
 If no Plex MCP is present, pr-master skips this step. Plex is not required to use pr-master.
 
-## The test-writing skill
+## Shared reference skills
 
-Every change that pushes code ships with a test when one applies. The bundled `test-writing` skill carries the guidance for what a thorough test looks like, so the bar isn't hardcoded to one framework. It runs automatically as part of `respond` and the fixers; you don't invoke it directly.
+Two bundled skills carry guidance the code-writing commands defer to, so the bar isn't hardcoded to one framework or restated in every command:
+
+- **`test-writing`** — what a thorough test looks like. Every change `respond` pushes ships with a test when one applies.
+- **`comment-discipline`** — how much to comment. Match the target repo's own stated convention when it has one; otherwise default to sparse, non-obvious-`why`-only comments. Applies to `respond`, `fix-ci`, and `fix-conflicts` — anywhere pr-master writes or edits code.
+
+Both load automatically as part of those commands; you don't invoke them directly.
 
 ## Install
 

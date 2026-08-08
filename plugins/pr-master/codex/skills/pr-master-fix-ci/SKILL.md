@@ -16,7 +16,7 @@ Use this when the user wants failing GitHub Actions checks diagnosed and repaire
 2. Fetch failed checks with `gh`.
 3. Download failed logs.
 4. Diagnose each failing check, not only the aggregate workflow result.
-5. Apply fixes locally.
+5. Apply fixes locally. Load and follow the `comment-discipline` skill first for how much to comment.
 6. Validate using the same repo scripts CI relies on.
 7. Commit the fixes.
 8. Only push if the user explicitly asked for it.
